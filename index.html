@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creador de árboles de decisión</title>
+  <meta name="description" content="Arma árboles de decisión con valores numéricos o algebraicos y exportalos como imagen para Word.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8 16L22 8M8 16L22 24' stroke='%2317597f' stroke-width='2'/%3E%3Crect x='2' y='11' width='10' height='10' fill='%2317597f'/%3E%3Ccircle cx='24' cy='8' r='5' fill='%2317597f'/%3E%3Ccircle cx='24' cy='24' r='5' fill='%2317597f'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Creador de árboles de decisión</h1>
+    <div class="examples">
+      Ejemplos:
+      <button class="link" data-action="example" data-example="proveedores">Proveedores (algebraico)</button>
+      <button class="link" data-action="example" data-example="lanzamiento">Lanzamiento (numérico)</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="editor">
+      <section class="card">
+        <label>Nodo de decisión
+          <input id="decision" placeholder="Elegir proveedor (E)">
+        </label>
+        <div class="pair">
+          <label>Criterio
+            <select id="criterion">
+              <option value="min">Minimizar (costos)</option>
+              <option value="max">Maximizar (beneficios)</option>
+            </select>
+          </label>
+          <label>Unidad
+            <input id="unit" placeholder="€">
+          </label>
+        </div>
+        <label class="check"><input type="checkbox" id="showAltNames"> Nombre de cada alternativa sobre su rama</label>
+        <label class="check"><input type="checkbox" id="showChoice"> Marcar la decisión óptima en el árbol</label>
+      </section>
+
+      <div id="alternatives"></div>
+      <button class="secondary" data-action="add-alt">+ Agregar alternativa</button>
+
+      <p class="hint">
+        El resultado puede ser un número (<code>3.300.000</code>) o una expresión (<code>C+10</code>, <code>C-100+10</code>).
+        La probabilidad acepta <code>0,8</code>, <code>0.8</code> u <code>80%</code>.
+      </p>
+    </div>
+
+    <div class="output">
+      <section class="card">
+        <div class="toolbar">
+          <button data-action="copy">Copiar imagen</button>
+          <button class="secondary" data-action="png">Descargar PNG</button>
+          <button class="secondary" data-action="svg">Descargar SVG</button>
+          <span id="status" role="status"></span>
+        </div>
+        <ul id="warnings" hidden></ul>
+        <div id="preview"></div>
+      </section>
+
+      <section class="card">
+        <h2>Resolución analítica</h2>
+        <div id="resolution"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="src/expr.js"></script>
+  <script src="src/tree.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
