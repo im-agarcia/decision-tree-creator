@@ -141,7 +141,7 @@
 
     const showChoice = model.showChoice && calc.best !== null;
     const choiceText = showChoice ? evText(alts[calc.best], calc.unit) : '';
-    const H = Math.ceil(Math.max(bodyBottom, sqCy + sqH / 2 + (showChoice ? LH + 8 : 0)) + PAD);
+    const H = Math.ceil(Math.max(bodyBottom, sqCy + sqH / 2 + (showChoice ? LH + 8 : 0)) + PAD) + 8;
 
     const out = [];
     const line = (x1, y1, x2, y2) =>
@@ -184,6 +184,8 @@
       text(cX, g.cy - LH / 2 - 2 + FS * 0.35, circleLines[i][0], { anchor: 'middle', fill: '#fff' });
       text(cX, g.cy + LH / 2 + 2 + FS * 0.35, circleLines[i][1], { anchor: 'middle', fill: '#fff' });
     });
+
+    out.push(`<text x="${W - 10}" y="${H - 8}" text-anchor="end" fill="#9aa5ae" font-size="10">powered by AG</text>`);
 
     const svg =
       `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="${FONT}" font-size="${FS}">` +

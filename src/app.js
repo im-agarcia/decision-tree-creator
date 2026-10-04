@@ -29,25 +29,25 @@
         },
       ],
     },
-    lanzamiento: {
-      decision: 'Lanzar producto (L)',
+    disenos: {
+      decision: 'Elegir diseño',
       criterion: 'max',
       unit: '€',
       showAltNames: true,
       showChoice: false,
       alternatives: [
         {
-          name: 'Lanzar', symbol: 'L',
+          name: 'Diseño 1', symbol: 'D1',
           scenarios: [
-            { name: 'Éxito', prob: '0,8', result: '3.300.000' },
-            { name: 'Fracaso', prob: '0,2', result: '800.000' },
+            { name: '70% buenos', prob: '0,8', result: '35.000*250 - 5.000.000 - 450.000' },
+            { name: '50% buenos', prob: '0,2', result: '25.000*250 - 5.000.000 - 450.000' },
           ],
         },
         {
-          name: 'No lanzar', symbol: 'N',
+          name: 'Diseño 2', symbol: 'D2',
           scenarios: [
-            { name: 'Demanda alta', prob: '0,5', result: '2.400.000' },
-            { name: 'Demanda baja', prob: '0,5', result: '1.600.000' },
+            { name: '70% buenos', prob: '0,7', result: '35.000*250 - 5.000.000 - 600.000' },
+            { name: '50% buenos', prob: '0,3', result: '25.000*250 - 5.000.000 - 600.000' },
           ],
         },
       ],
