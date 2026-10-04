@@ -2,7 +2,13 @@
 
 Aplicación web estática para armar árboles de decisión de un nivel (una decisión, varias alternativas, escenarios con probabilidad) y exportarlos como imagen para pegar en Word.
 
-## Formato del diagrama
+## Formatos del diagrama
+
+El mismo ejercicio se puede dibujar de dos maneras, y ambas llevan la firma "powered by AG" al pie.
+
+**Detallado (columnas con el paso a paso):** cada escenario recorre las columnas que definas (por ejemplo producción, ingresos y costos) hasta la columna del resultado; a la derecha va el valor esperado de cada alternativa y, abajo, el cuadro de comparación y decisión. Las columnas, sus títulos y el texto de cada celda son libres. Una celda con una cuenta de una sola línea (`35.000 × 250`) agrega sola su resultado.
+
+**Compacto (formato de la cátedra):**
 
 - Nodo de decisión cuadrado a la izquierda, con una rama por alternativa.
 - Cada alternativa termina en un nodo de probabilidad circular con su valor esperado adentro: `E(A) = C + 13`.

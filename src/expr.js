@@ -25,7 +25,7 @@
     while (i < src.length) {
       const ch = src[i];
       const num = /^\d[\d.,]*/.exec(src.slice(i));
-      const id = /^[A-Za-zÀ-ÿ_][A-Za-zÀ-ÿ0-9_]*/.exec(src.slice(i));
+      const id = /^[A-Za-zÀ-ÖØ-öø-ÿ_][A-Za-zÀ-ÖØ-öø-ÿ0-9_]*/.exec(src.slice(i));
       if (num) {
         const text = num[0].replace(/[.,]+$/, '');
         tokens.push({ t: 'num', v: parseNumber(text) });

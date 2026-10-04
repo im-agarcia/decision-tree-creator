@@ -33,21 +33,31 @@
       decision: 'Elegir diseño',
       criterion: 'max',
       unit: '€',
-      showAltNames: true,
-      showChoice: false,
+      style: 'detailed',
+      columns: [
+        { title: 'Producción y ventas', subtitle: '(sobre 50.000 unidades)' },
+        { title: 'Ingresos', subtitle: '(250 € por bueno)' },
+        { title: 'Costos', subtitle: 'totales' },
+      ],
+      resultTitle: 'Beneficio',
+      resultSubtitle: '(resultado)',
       alternatives: [
         {
-          name: 'Diseño 1', symbol: 'D1',
+          name: 'Diseño 1', symbol: 'D1', detail: '(costo del diseño: 450.000 €)',
           scenarios: [
-            { name: '70% buenos', prob: '0,8', result: '35.000*250 - 5.000.000 - 450.000' },
-            { name: '50% buenos', prob: '0,2', result: '25.000*250 - 5.000.000 - 450.000' },
+            { name: '70 % buenos', prob: '0,8', result: '8.750.000 - 5.450.000',
+              cells: ['35.000 buenos\n15.000 malos', '35.000 × 250', '5.000.000\n(costo fabricación)\n+ 450.000\n(diseño 1)\n= 5.450.000 €'] },
+            { name: '50 % buenos', prob: '0,2', result: '6.250.000 - 5.450.000',
+              cells: ['25.000 buenos\n25.000 malos', '25.000 × 250', '5.000.000\n(costo fabricación)\n+ 450.000\n(diseño 1)\n= 5.450.000 €'] },
           ],
         },
         {
-          name: 'Diseño 2', symbol: 'D2',
+          name: 'Diseño 2', symbol: 'D2', detail: '(costo del diseño: 600.000 €)',
           scenarios: [
-            { name: '70% buenos', prob: '0,7', result: '35.000*250 - 5.000.000 - 600.000' },
-            { name: '50% buenos', prob: '0,3', result: '25.000*250 - 5.000.000 - 600.000' },
+            { name: '70 % buenos', prob: '0,7', result: '8.750.000 - 5.600.000',
+              cells: ['35.000 buenos\n15.000 malos', '35.000 × 250', '5.000.000\n(costo fabricación)\n+ 600.000\n(diseño 2)\n= 5.600.000 €'] },
+            { name: '50 % buenos', prob: '0,3', result: '6.250.000 - 5.600.000',
+              cells: ['25.000 buenos\n25.000 malos', '25.000 × 250', '5.000.000\n(costo fabricación)\n+ 600.000\n(diseño 2)\n= 5.600.000 €'] },
           ],
         },
       ],
@@ -58,12 +68,27 @@
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const $ = (id) => document.getElementById(id);
 
+  const DEFAULTS = {
+    style: 'compact', columns: [], showHeaders: true, resultTitle: 'Resultado', resultSubtitle: '',
+    showAltNames: true, showChoice: false,
+  };
+
+  // Completa los campos que falten (modelos guardados por versiones anteriores, ejemplos).
+  function normalize(m) {
+    const out = { ...DEFAULTS, ...m };
+    out.alternatives.forEach((a) => {
+      a.detail = a.detail || '';
+      a.scenarios.forEach((s) => { s.cells = s.cells || []; });
+    });
+    return out;
+  }
+
   function load() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved && Array.isArray(saved.alternatives)) return saved;
+      if (saved && Array.isArray(saved.alternatives)) return normalize(saved);
     } catch (_) { /* sin almacenamiento: se usa el ejemplo */ }
-    return clone(EXAMPLES.proveedores);
+    return normalize(clone(EXAMPLES.proveedores));
   }
 
   function save() {
@@ -74,8 +99,8 @@
   let current = { svg: '', width: 0, height: 0 };
 
   const ctx = document.createElement('canvas').getContext('2d');
-  const measure = (text, size, font) => {
-    ctx.font = `${size}px ${font}`;
+  const measure = (text, size, font, bold) => {
+    ctx.font = `${bold ? 'bold ' : ''}${size}px ${font}`;
     return ctx.measureText(text).width;
   };
 
@@ -85,6 +110,26 @@
     $('unit').value = model.unit;
     $('showAltNames').checked = !!model.showAltNames;
     $('showChoice').checked = !!model.showChoice;
+    $('style').value = model.style;
+    $('showHeaders').checked = !!model.showHeaders;
+    $('resultTitle').value = model.resultTitle;
+    $('resultSubtitle').value = model.resultSubtitle;
+
+    const detailed = model.style === 'detailed';
+    $('detail-settings').hidden = !detailed;
+    $('compact-settings').hidden = detailed;
+    $('columns').innerHTML = model.columns.map((c, k) => `
+      <div class="col-row">
+        <input data-col="${k}" data-f="title" value="${esc(c.title)}" placeholder="Título (ej. Ingresos)" aria-label="Título de la columna">
+        <input data-col="${k}" data-f="subtitle" value="${esc(c.subtitle)}" placeholder="Subtítulo (opcional)" aria-label="Subtítulo de la columna">
+        <button class="icon" data-action="del-col" data-col="${k}" title="Quitar columna" aria-label="Quitar columna">✕</button>
+      </div>`).join('');
+    const cellsHtml = (sc, i, j) => (detailed && model.columns.length ? `
+      <div class="cells">${model.columns.map((c, k) => `
+        <label>${esc(c.title || `Columna ${k + 1}`)}
+          <textarea rows="2" data-alt="${i}" data-sc="${j}" data-cell="${k}">${esc(sc.cells[k] || '')}</textarea>
+        </label>`).join('')}
+      </div>` : '');
 
     $('alternatives').innerHTML = model.alternatives.map((alt, i) => `
       <section class="card alt">
@@ -97,6 +142,9 @@
           </label>
           <button class="icon" data-action="del-alt" data-alt="${i}" title="Quitar alternativa" aria-label="Quitar alternativa">✕</button>
         </div>
+        ${detailed ? `<label class="detail">Detalle bajo el nombre (opcional)
+          <input data-alt="${i}" data-f="detail" value="${esc(alt.detail)}" placeholder="(costo del diseño: 450.000 €)">
+        </label>` : ''}
         <div class="rows">
           <div class="row head"><span>Escenario</span><span>Probabilidad</span><span>Resultado</span><span></span></div>
           ${alt.scenarios.map((sc, j) => `
@@ -105,7 +153,7 @@
               <input data-alt="${i}" data-sc="${j}" data-f="prob" value="${esc(sc.prob)}" placeholder="0,8" aria-label="Probabilidad">
               <input data-alt="${i}" data-sc="${j}" data-f="result" value="${esc(sc.result)}" placeholder="C+10 o 3.300.000" aria-label="Resultado">
               <button class="icon" data-action="del-sc" data-alt="${i}" data-sc="${j}" title="Quitar escenario" aria-label="Quitar escenario">✕</button>
-            </div>`).join('')}
+            </div>${cellsHtml(sc, i, j)}`).join('')}
         </div>
         <button class="link" data-action="add-sc" data-alt="${i}">+ Agregar escenario</button>
       </section>`).join('');
@@ -189,10 +237,15 @@
   const actions = {
     'add-alt'() {
       const symbol = String.fromCharCode(65 + (model.alternatives.length % 26));
-      model.alternatives.push({ name: `Alternativa ${symbol}`, symbol, scenarios: [{ name: '', prob: '', result: '' }] });
+      model.alternatives.push({ name: `Alternativa ${symbol}`, symbol, detail: '', scenarios: [{ name: '', prob: '', result: '', cells: [] }] });
     },
     'del-alt'(d) { model.alternatives.splice(+d.alt, 1); },
-    'add-sc'(d) { model.alternatives[+d.alt].scenarios.push({ name: '', prob: '', result: '' }); },
+    'add-sc'(d) { model.alternatives[+d.alt].scenarios.push({ name: '', prob: '', result: '', cells: [] }); },
+    'add-col'() { model.columns.push({ title: '', subtitle: '' }); },
+    'del-col'(d) {
+      model.columns.splice(+d.col, 1);
+      model.alternatives.forEach((a) => a.scenarios.forEach((s) => s.cells.splice(+d.col, 1)));
+    },
     'del-sc'(d) { model.alternatives[+d.alt].scenarios.splice(+d.sc, 1); },
   };
 
@@ -206,7 +259,7 @@
         renderForm();
         update();
       } else if (action === 'example') {
-        model = clone(EXAMPLES[btn.dataset.example]);
+        model = normalize(clone(EXAMPLES[btn.dataset.example]));
         renderForm();
         update();
       } else if (action === 'png') {
@@ -227,6 +280,11 @@
     const f = el.dataset.f;
     if (el.id && el.id in model) {
       model[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+      if (el.id === 'style') renderForm();
+    } else if (el.dataset.col !== undefined) {
+      model.columns[+el.dataset.col][f] = el.value;
+    } else if (el.dataset.cell !== undefined) {
+      model.alternatives[+el.dataset.alt].scenarios[+el.dataset.sc].cells[+el.dataset.cell] = el.value;
     } else if (f && el.dataset.sc !== undefined) {
       model.alternatives[+el.dataset.alt].scenarios[+el.dataset.sc][f] = el.value;
     } else if (f) {

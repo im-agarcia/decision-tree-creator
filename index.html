@@ -35,8 +35,28 @@
             <input id="unit" placeholder="€">
           </label>
         </div>
-        <label class="check"><input type="checkbox" id="showAltNames"> Nombre de cada alternativa sobre su rama</label>
-        <label class="check"><input type="checkbox" id="showChoice"> Marcar la decisión óptima en el árbol</label>
+        <label>Formato del diagrama
+          <select id="style">
+            <option value="compact">Compacto (formato de la cátedra)</option>
+            <option value="detailed">Detallado (columnas con el paso a paso)</option>
+          </select>
+        </label>
+        <div id="compact-settings">
+          <label class="check"><input type="checkbox" id="showAltNames"> Nombre de cada alternativa sobre su rama</label>
+          <label class="check"><input type="checkbox" id="showChoice"> Marcar la decisión óptima en el árbol</label>
+        </div>
+        <div id="detail-settings" hidden>
+          <label class="check"><input type="checkbox" id="showHeaders"> Encabezados de columna</label>
+          <div class="subhead">Columnas de detalle (entre el escenario y el resultado)</div>
+          <div id="columns"></div>
+          <button class="link" data-action="add-col">+ Agregar columna</button>
+          <div class="subhead">Columna del resultado</div>
+          <div class="col-row">
+            <input id="resultTitle" placeholder="Título (ej. Beneficio)" aria-label="Título del resultado">
+            <input id="resultSubtitle" placeholder="Subtítulo (opcional)" aria-label="Subtítulo del resultado">
+            <span></span>
+          </div>
+        </div>
       </section>
 
       <div id="alternatives"></div>
@@ -45,6 +65,7 @@
       <p class="hint">
         El resultado puede ser un número (<code>3.300.000</code>) o una expresión (<code>C+10</code>, <code>C-100+10</code>).
         La probabilidad acepta <code>0,8</code>, <code>0.8</code> u <code>80%</code>.
+        En el formato detallado, una celda con una cuenta de una sola línea (<code>35.000 × 250</code>) muestra también su resultado.
       </p>
     </div>
 
